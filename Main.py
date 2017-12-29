@@ -1,13 +1,8 @@
-import argparse
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-
 class Cell:
     def __init__(self, row, col):
         self.row = row
         self.col = col
-        self.alive = False
+        self.alive = 0
 
 
 class Board:
@@ -21,9 +16,24 @@ class Board:
         #Create board of cells
         self.board = [[Cell(h, w) for h in range(width)] for w in range(height)]
 
+        # To review is a list of squares to review, which encompass the 'alive' cells
+        # as as their surrounding cells.
+        self.toReview = []
 
-    def evalCell(self, row, col):
-        aliveCount = 0
+
+    def __str__(self):
+        retStr = ""
+        for row in range(len(self.board)):
+            for col in range(len(self.board[0])):
+                retStr += self.board[row][col].alive
+
+            retStr += "\n"
+
+    def surroundCells(self, row, col):
+        assert(row <= self.height-1 and col <= self.width -1), "Row needs to be between 0 and " \
+                                                             "%i and Col needs to be between 0 and " \
+                                                             "%i" % (self.height, self.width)
+        ret = []
         for c in [col-1, col, col+1]:
             if (col==0 and c == -1):
                 c = self.width-1
@@ -39,41 +49,29 @@ class Board:
                 if (row == self.height-1 and r == self.height):
                     r = 0
 
+                ret.append((r,c))
 
-                if self.board[r][c].alive == True:
-                    aliveCount += 1
-                    print("Alive found at %s,%s" % (r, c))
+        return (ret)
 
-        return aliveCount
-
+    def checkSurroundCell(self,row, col):
+        alive = 0
+        for (r,c) in self.surroundCells(row,col):
+            if self.board[r][c].alive:
+                alive += 1
+                print(alive,r,c)
+        return alive
 
     def setAlive(self, row, col):
-        self.board[row][col].alive = True
+        self.board[row][col].alive = 1
 
 if __name__ == '__main__':
-    maxR = 100
-    maxC = 100
     b = Board(100,100)
 
-    b.setAlive(99,0)
-    print(b.evalCell(0,0))
+    a = b.surroundCells(10,10)
 
-    X = b
+    b.setAlive(5,5)
+    b.setAlive(6,6)
+    b.setAlive(4,5)
+    b.checkSurroundCell(5, 5)
 
-    fig, ax = plt.subplots()
-    ax.imshow(X.board, interpolation='none')
-
-    numrows, numcols = X.height, X.width
-
-
-    def format_coord(x, y):
-        col = int(x + 0.5)
-        row = int(y + 0.5)
-        if col >= 0 and col < numcols and row >= 0 and row < numrows:
-            z = X.board[row][col]
-            return 'x=%1.4f, y=%1.4f, z=%1.4f' % (x, y, z)
-        else:
-            return 'x=%1.4f, y=%1.4f' % (x, y)
-
-    ax.format_coord = format_coord
-    plt.show()
+    print(list(a))
