@@ -1,10 +1,6 @@
-#Cell is a basic unit which contains a coordinate and a binary property, 'alive'
-class Cell:
-    def __init__(self, row, col):
-        self.row = row
-        self.col = col
-        self.alive = 0
-
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 #Creates the board, which is a 2D array of 'cells'.
 class Board:
@@ -16,7 +12,7 @@ class Board:
         self.width = width
 
         #Create board of cells
-        self.board = [[Cell(h, w) for h in range(width)] for w in range(height)]
+        self.board = np.array([[0 for h in range(width)] for w in range(height)])
 
         # To review is a list of squares to review, which encompass the 'alive' cells
         # as as their surrounding cells.
@@ -28,7 +24,7 @@ class Board:
         for row in range(len(self.board)):
             for col in range(len(self.board[0])):
                 # if (str(self.board[row][col].alive))
-                retStr += str(self.board[row][col].alive)
+                retStr += str(self.board[row][col])
 
 
             retStr += "\n"
@@ -65,23 +61,20 @@ class Board:
         aliveCounter = 0
 
         for (r,c) in self.surroundCells(row,col):
-            # print(self.board[r][c], r, c)
-            if ((r,c) != (row,col)) and (self.board[r][c].alive == 1) :
+            if ((r,c) != (row,col)) and (self.board[r][c] == 1) :
                 aliveCounter += 1
-        # print(aliveCounter)
         return aliveCounter
 
-    #Sets certain cell to alive
+    #Sets certain coordinates to be alive
     def setAlive(self, row, col):
-        self.board[row][col].alive = 1
+        self.board[row][col] = 1
 
         for (r,c) in self.surroundCells(row, col):
-            # print(r,c)
             self.toReview.add((r,c))
 
     #Inputs cell location to kill
     def killCell(self, row, col):
-        self.board[row][col].alive = 0
+        self.board[row][col] = 0
 
     # Step where actual game logic occurs, cells become 'alive' or 'dead' based on itself and the state of
     # the cells around it.
@@ -91,7 +84,7 @@ class Board:
         toAlive = []
 
         for (r,c) in temp:
-            currentCellStatus = self.board[r][c].alive
+            currentCellStatus = self.board[r][c]
             surroundCells = self.checkSurroundCell(r, c)
             # print(r,c,currentCellStatus,surroundCells)
             if (currentCellStatus == 1) and ((surroundCells < 2) or (surroundCells > 3)):
@@ -118,8 +111,4 @@ if __name__ == '__main__':
     b.setAlive(9, 5)
     b.setAlive(11, 5)
 
-
-    for i in range(5):
-        print(b)
-        b.runStep()
-
+    plt.imshow(b.board, interpolation='nearest')
