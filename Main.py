@@ -23,7 +23,6 @@ class Board:
         retStr = ""
         for row in range(len(self.board)):
             for col in range(len(self.board[0])):
-                # if (str(self.board[row][col].alive))
                 retStr += str(self.board[row][col])
 
 
@@ -78,7 +77,8 @@ class Board:
 
     # Step where actual game logic occurs, cells become 'alive' or 'dead' based on itself and the state of
     # the cells around it.
-    def runStep(self):
+    def runStep(self, frame, img):
+        print("UPDATED!")
         temp = list(self.toReview)
         toKill = []
         toAlive = []
@@ -86,7 +86,6 @@ class Board:
         for (r,c) in temp:
             currentCellStatus = self.board[r][c]
             surroundCells = self.checkSurroundCell(r, c)
-            # print(r,c,currentCellStatus,surroundCells)
             if (currentCellStatus == 1) and ((surroundCells < 2) or (surroundCells > 3)):
                 toKill.append((r,c))
 
@@ -101,6 +100,9 @@ class Board:
         for (r,c) in toAlive:
             self.setAlive(r,c)
 
+        img.set_data(self.board)
+        return img,
+
 
 if __name__ == '__main__':
     b = Board(20,20)
@@ -110,5 +112,17 @@ if __name__ == '__main__':
 
     b.setAlive(9, 5)
     b.setAlive(11, 5)
+    b.setAlive(12, 5)
+    b.setAlive(13, 5)
+    b.setAlive(14, 5)
+    b.setAlive(4, 5)
+    b.setAlive(1, 2)
+    b.setAlive(2, 4)
 
-    plt.imshow(b.board, interpolation='nearest')
+
+    fig, ax = plt.subplots()
+    img = ax.imshow(b.board, interpolation='nearest')
+
+    ani = animation.FuncAnimation(fig, b.runStep,fargs=(img,), frames = 10, interval = 1000, save_count= 50)
+
+    plt.show()
