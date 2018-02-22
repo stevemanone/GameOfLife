@@ -78,7 +78,7 @@ class Board:
     # Step where actual game logic occurs, cells become 'alive' or 'dead' based on itself and the state of
     # the cells around it.
     def runStep(self, frame, img):
-        print("UPDATED!")
+        print("UPDATED FRAME!")
         temp = list(self.toReview)
         toKill = []
         toAlive = []
@@ -105,24 +105,27 @@ class Board:
 
 
 if __name__ == '__main__':
-    b = Board(20,20)
-    b.setAlive(10,3)
-    b.setAlive(10,5)
-    b.setAlive(10, 7)
+    rows = 10
+    cols = 10
+    percentFilled = .5
 
-    b.setAlive(9, 5)
-    b.setAlive(11, 5)
-    b.setAlive(12, 5)
-    b.setAlive(13, 5)
-    b.setAlive(14, 5)
-    b.setAlive(4, 5)
-    b.setAlive(1, 2)
-    b.setAlive(2, 4)
 
+    b = Board(rows,cols)
+
+    initAliveCells = int(rows*cols*percentFilled)
+
+    rowVals = np.random.randint(rows, size=initAliveCells)
+    colVals = np.random.randint(cols, size=initAliveCells)
+
+    initAliveCoordinates = zip(rowVals, colVals)
+
+    for (x,y) in initAliveCoordinates:
+        b.setAlive(x,y)
 
     fig, ax = plt.subplots()
     img = ax.imshow(b.board, interpolation='nearest')
 
-    ani = animation.FuncAnimation(fig, b.runStep,fargs=(img,), frames = 10, interval = 1000, save_count= 50)
+    ani = animation.FuncAnimation(fig, b.runStep,fargs=(img,), frames = 10, interval = 100, save_count= 50)
+    plt.axis('off')
 
     plt.show()
